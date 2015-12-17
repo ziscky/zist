@@ -1,4 +1,5 @@
 # **zist**
+[![Build Status](https://travis-ci.org/ziscky/zist.svg?branch=master)](https://travis-ci.org/ziscky/zist)
 
 #A simple modern server program to manage and interact process instances.
 ------------------------------------------------------------------------
