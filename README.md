@@ -1,33 +1,40 @@
-#**zist
-A painkiller to use when deploying binaries (especially Go code) to manage/deploy instances of processes. Also carries a set of libraries to ease writing manageable Go code.
+# **zist**
 
-##The supervisor can:
+#A simple modern server program to manage and interact process instances.
+------------------------------------------------------------------------
 
--Start/Kill a process
+##Start Processes (with automatic process restarting)
+Start processes using an easy to write config file. Check the examples directory.All you need is:
 
--View process stats i.e cpu/mem usage
+ - Port
+ -  Protocol ( *For https a keyfile and certfile are required obviously*)
+ -  Access Token
+ - Process Path
+ - Process Name
 
--Restart a process automatically
+That's All!!
 
--Provide a stream of stdout/stderr output to terminal/twitter/browser
+## Live Process Interaction
+ - View process stats i.e cpu/mem usage
+ -  Start a process and Kill it
+ - Restart a process
+ - View a list of all managed processes and valuable information e.g
+ - *[{"isalive":true,"name":"xm","numrestarts":1,"path":"/home/eziscky/Golang/src/github.com/ziscky/tests/xm","pid":2067,"timealive":"13.410013177s","timestarted":"2015-12-17 13:36:44.540403109 +0300 EAT"}]*
+ - Stream stdout/stderr output to a web endpoint, with pretty basic JSON output
 
--Email/tweet/*text error logs to dev/sysadmin depending on the custom severity level
+##Crash Reporting
+ 1. Send a mail of the managed instance context(*configurable*) after the
+    crash to a list of emails.
 
--Provide reverse proxying capabilities
+##Process Detach
+ - If you don't like the *coupling of your proc's instance with zist* you
+   can simply detach it after you're done monitoring it!!
+**N.B** *Process Detach is only supported for direct invocation of binaries. So if you run a sh script, I'm working to support that. Or just send in a pull request :)*
 
-##Ships with a fast deploy tool 
->For Go code which builds,tests (reporting failures) and deploys code automatically.
+##Process Injection
+ - Support for config injection to add new processes without restarting zist is in dev. *Basically Live Config Reloading.*
 
-##Useful middleware and libraries:
--Commonly used header inclusion e.g CORS
-
--Profiling Request Handlers
-
--Basic customizable HTTP Auth
-
--Request Variable Storage //Only if you use the library it includes
-
--logging of errors to stdout/stderr/file depending on severity level
-
-##PLANS
--Github and Jira integrations
+#NOTE
+ - Still under moderately heavy development so expect some changes
+ - Still undergoing refactoring
+ - Mail Logging is not complete but other supervisor functions are OK.

@@ -1,22 +1,24 @@
 package main
 
 import (
-	"bufio"
 	"flag"
-	"fmt"
+	"log"
+	"net/http"
+	"os"
 	"sync"
-	"time"
+
+	"github.com/gorilla/mux"
 )
 
 var (
-	activeProcesses map[int]ChildProcess
+	activeProcesses map[int]*ChildProcess
 	procLock        sync.RWMutex
 )
 
 func AddProcess(cp *ChildProcess) {
 	procLock.Lock()
 	defer procLock.Unlock()
-	activeProcesses[cp.PID] = *cp
+	activeProcesses[cp.PID] = cp
 }
 
 func RemoveProcess(cp *ChildProcess) {
@@ -25,86 +27,62 @@ func RemoveProcess(cp *ChildProcess) {
 	delete(activeProcesses, cp.PID)
 }
 
-func RegisterProcess(ps process) error {
+func RegisterProcess(ps process, rcount int) error {
 	cp := new(ChildProcess)
+	if _, err := os.Stat(ps.Path); os.IsNotExist(err) {
+		log.Println(ps.Path, " does not exist")
+		return err
+	}
 	if err := cp.Initialize(ps.Path); err != nil {
+		log.Println(err)
 		return err
 	}
 	cp.Pname = ps.Pname
-	//Start logging the process stdout
-	go func() {
-		stdOutScanner := bufio.NewScanner(cp.StdOutR)
-		for stdOutScanner.Scan() {
-			cp.AppendOutput(stdOutScanner.Text())
-		}
-	}()
-	//Start logging the process stderr
-	go func() {
-		stdErrScanner := bufio.NewScanner(cp.StdErrR)
-		for stdErrScanner.Scan() {
-			cp.AppendError(stdErrScanner.Text())
-		}
-	}()
-	if len(ps.Plogs.Plogs) > 0 {
-		for _, plog := range ps.Plogs.Plogs {
-			go func() {
-				ticker := time.NewTicker(time.Duration(plog.Interval) * time.Minute)
-				stop := make(chan struct{})
-				for {
-					select {
-					case <-ticker.C:
-						if plog.Mail == "on" {
-							//send mail
-						}
-						if plog.Twitter == "on" {
-							//post to twitter
-						}
-					case <-stop:
-						ticker.Stop()
-					}
-				}
-			}()
-		}
-	}
+	cp.PPath = ps.Path
+	cp.IsAlive = true
+	cp.RestartCount = rcount
+
+	//web statistics settings
 	cp.EStats = ps.Outputs.Stats.Web == "on"
 	cp.EStdErr = ps.Outputs.StdErr.Web == "on"
 	cp.EStdOut = ps.Outputs.StdOut.Web == "on"
 
-	if ps.Outputs.StdOut.Twitter == "on" {
-		go func() {
-			//post to twitter after interval
-		}()
+	//Start logging the process stdout
+	go LogStdOut(cp)
+	//Start logging the process stderr
+	go LogStdErr(cp)
+
+	if len(ps.Plogs.Plogs) > 0 {
+		for _, plog := range ps.Plogs.Plogs {
+			go SendPLogs(plog, cp)
+		}
 	}
+
+	if ps.Outputs.StdOut.Twitter == "on" {
+		go StreamOutToTwitter(cp) //still in dev
+	}
+
 	if ps.Outputs.StdErr.Twitter == "on" {
-		go func() {
-			//post to twitter after interval
-		}()
+		go AirDirtyLaundry(cp) //still in dev
 	}
 
 	AddProcess(cp)
 	if err := cp.Proc.Wait(); err != nil {
-		return err
+		log.Println(cp.PPath, "Non zero exit: ", err)
 	}
-	if !cp.KillSwitch && ps.Restart == "on" { //restart process
-		if ps.CrashReport.Enable {
-			if len(ps.CrashReport.Mail.Rcps) > 0 {
-				if ps.CrashReport.Mail.Body == "log" {
 
-				}
-				if ps.CrashReport.Mail.Body == "stderr" {
-				}
-				if ps.CrashReport.Mail.Body == "stdout" {
-				}
-				if ps.CrashReport.Mail.Body == "combined" {
-				}
-				//send body
+	if !cp.KillSwitch {
+		if ps.Restart == "on" { //restart process
+			if ps.CrashReport.Enable {
+				CrashReport(ps)
 			}
-			if ps.CrashReport.Twitter.Message != "" {
-				//tweet message and hashtag
-			}
+			RemoveProcess(cp)
+			return RegisterProcess(ps, cp.RestartCount+1)
 		}
 		RemoveProcess(cp)
-		return RegisterProcess(ps)
+	}
+	if !cp.DetachF {
+		activeProcesses[cp.PID].IsAlive = false
 	}
 	return nil
 }
@@ -115,22 +93,37 @@ var (
 )
 
 func main() {
-	confPath := flag.String("conf", "", "-conf=/home/conf.xml")
+	confPath := flag.String("conf", "", "-conf=/path/to/conffile")
+	keyfile := flag.String("keyfile", "", "-keyfile=path/to/keyfile")
+	certfile := flag.String("certfile", "", "-certfile=path/to/certfile")
+	flag.Parse()
 
 	appConf, err = ParseXMLDirectives(*confPath)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return
 	}
-
+	activeProcesses = make(map[int]*ChildProcess)
 	for _, ps := range appConf.Ps.Pss {
-		go RegisterProcess(ps)
+		go RegisterProcess(ps, 0)
 	}
-	// http.HandleFunc("/{token}", handler)
-	// http.HandleFunc("/{token}/{pid}/stats", handler)
-	// http.HandleFunc("/{token}/{pid}/stdout", handler)
 
-	// http.HandleFunc("/{token}/{pid}/stderr", handler)
-	// http.HandleFunc("/{token}/{pid}/kill", handler)
-	// http.HandleFunc("/{token}/{pid}/start", handler)
+	router := mux.NewRouter()
+	router.HandleFunc("/{token}", CheckToken(Default))
+	router.HandleFunc("/{token}/{pid}/stats", CheckToken(WithProcess(Stats)))
+	router.HandleFunc("/{token}/{pid}/kill", CheckToken(WithProcess(Kill)))
+	router.HandleFunc("/{token}/{pid}/start", CheckToken(WithProcess(Start)))
+	router.HandleFunc("/{token}/{pid}/restart", CheckToken(WithProcess(Restart)))
+	router.HandleFunc("/{token}/{pid}/stdout", CheckToken(WithProcess(StdOut)))
+	router.HandleFunc("/{token}/{pid}/stderr", CheckToken(WithProcess(StdErr)))
+	router.HandleFunc("/{token}/{pid}/detach", CheckToken(WithProcess(Detach)))
+	//ability to detach process
+	switch appConf.Ep.Protocol {
+	case "http":
+		http.ListenAndServe(":"+appConf.Ep.Port, router)
+	case "https": //key file and certificate file needed
+		http.ListenAndServeTLS(":"+appConf.Ep.Port, *certfile, *keyfile, router)
+	default:
+		log.Println("Invalid protocol:", appConf.Ep.Protocol)
+	}
 }
