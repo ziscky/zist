@@ -1,82 +1,108 @@
 <!DOCTYPE html>
 <html>
-
   <head>
     <meta charset='utf-8'>
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <meta name="description" content="Zist : Sysadmin swiss knife">
 
-    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-dark.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
 
-    <title>Zist</title>
+    <title>Zist by ziscky</title>
   </head>
 
   <body>
 
-    <!-- HEADER -->
-    <div id="header_wrap" class="outer">
-        <header class="inner">
-          <a id="forkme_banner" href="https://github.com/ziscky/zist">View on GitHub</a>
+    <header>
+      <div class="container">
+        <h1>Zist</h1>
+        <h2>A modern server program to manage and interact with process instances.</h2>
 
-          <h1 id="project_title">Zist</h1>
-          <h2 id="project_tagline">Sysadmin swiss knife</h2>
+        <section id="downloads">
+          <a href="https://github.com/ziscky/zist/zipball/master" class="btn">Download as .zip</a>
+          <a href="https://github.com/ziscky/zist/tarball/master" class="btn">Download as .tar.gz</a>
+          <a href="https://github.com/ziscky/zist" class="btn btn-github"><span class="icon"></span>View on GitHub</a>
+        </section>
+      </div>
+    </header>
 
-            <section id="downloads">
-              <a class="zip_download_link" href="https://github.com/ziscky/zist/zipball/master">Download this project as a .zip file</a>
-              <a class="tar_download_link" href="https://github.com/ziscky/zist/tarball/master">Download this project as a tar.gz file</a>
-            </section>
-        </header>
-    </div>
-
-    <!-- MAIN CONTENT -->
-    <div id="main_content_wrap" class="outer">
-      <section id="main_content" class="inner">
+    <div class="container">
+      <section id="main_content">
         <h1>
-<a id="zist" class="anchor" href="#zist" aria-hidden="true"><span class="octicon octicon-link"></span></a>Zist</h1>
+<a id="zist" class="anchor" href="#zist" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>zist</strong>
+</h1>
+
+<p><a href="https://travis-ci.org/ziscky/zist"><img src="https://travis-ci.org/ziscky/zist.svg?branch=master" alt="Build Status"></a></p>
+
+<h1>
+<a id="a-simple-modern-server-program-to-manage-and-interact-process-instances" class="anchor" href="#a-simple-modern-server-program-to-manage-and-interact-process-instances" aria-hidden="true"><span class="octicon octicon-link"></span></a>A simple modern server program to manage and interact process instances.</h1>
+
+<hr>
 
 <h2>
-<a id="supervisor" class="anchor" href="#supervisor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Supervisor</h2>
+<a id="start-processes-with-automatic-process-restarting" class="anchor" href="#start-processes-with-automatic-process-restarting" aria-hidden="true"><span class="octicon octicon-link"></span></a>Start Processes (with automatic process restarting)</h2>
 
-<blockquote>
-<p>A simplified supervisor that can (re)start and kill processes as well as viewing stats through a configurable web 
-api endpoint.It also automatically sends emails of generated error logs to the specified emails after a specified period of time. The supervisor allows streaming of stdout/stderr of managed processes to an api endpoint/twitter(Developer account needed for twitter).</p>
+<p>Start processes using an easy to write config file. Check the examples directory.All you need is:</p>
 
-<p>The supervisor crashreporting offers the ability to provide an alert on twitter and/or emailing the last stdout/stderr/logfiles before the crash, making it easier to track down the cause.</p>
-</blockquote>
+<ul>
+<li>Port</li>
+<li> Protocol ( <em>For https a keyfile and certfile are required obviously</em>)</li>
+<li> Access Token</li>
+<li>Process Path</li>
+<li>Process Name</li>
+</ul>
 
-<h2>
-<a id="reverseproxy" class="anchor" href="#reverseproxy" aria-hidden="true"><span class="octicon octicon-link"></span></a>reverseproxy</h2>
-
-<blockquote>
-<p>The supervisor includes a stripped down reverse proxy, to proxy connections.</p>
-</blockquote>
+<p>That's All!!</p>
 
 <h2>
-<a id="fastdeploy-only-go-supported" class="anchor" href="#fastdeploy-only-go-supported" aria-hidden="true"><span class="octicon octicon-link"></span></a>fastdeploy (Only Go supported)</h2>
+<a id="live-process-interaction" class="anchor" href="#live-process-interaction" aria-hidden="true"><span class="octicon octicon-link"></span></a>Live Process Interaction</h2>
 
-<blockquote>
-<p>Listens for changes to a golang project repo on github or a folder containing go code and runs tests,reports failure/pass and deploys automatically.</p>
-</blockquote>
+<ul>
+<li>View process stats i.e cpu/mem usage</li>
+<li> Start a process and Kill it</li>
+<li>Restart a process</li>
+<li>View a list of all managed processes and valuable information e.g</li>
+<li><em>[{"isalive":true,"name":"xm","numrestarts":1,"path":"/home/eziscky/Golang/src/github.com/ziscky/tests/xm","pid":2067,"timealive":"13.410013177s","timestarted":"2015-12-17 13:36:44.540403109 +0300 EAT"}]</em></li>
+<li>Stream stdout/stderr output to a web endpoint, with pretty basic JSON output</li>
+</ul>
 
 <h2>
-<a id="libraries-and-middleware-for-go" class="anchor" href="#libraries-and-middleware-for-go" aria-hidden="true"><span class="octicon octicon-link"></span></a>Libraries and Middleware (For Go)</h2>
+<a id="crash-reporting" class="anchor" href="#crash-reporting" aria-hidden="true"><span class="octicon octicon-link"></span></a>Crash Reporting</h2>
 
-<blockquote>
-<p>Carries a useful set of functions e.g logging with variable severity and reporting mechanisms to various platforms.
-Includes profiling middleware to profile web requests,Basic HTTP Authentication,Common header inclusion.</p>
-</blockquote>
+<ol>
+<li>Send a mail of the managed instance context(<em>configurable</em>) after the
+crash to a list of emails.</li>
+</ol>
+
+<h2>
+<a id="process-detach" class="anchor" href="#process-detach" aria-hidden="true"><span class="octicon octicon-link"></span></a>Process Detach</h2>
+
+<ul>
+<li>If you don't like the <em>coupling of your proc's instance with zist</em> you
+can simply detach it after you're done monitoring it!!
+<strong>N.B</strong> <em>Process Detach is only supported for direct invocation of binaries. So if you run a sh script, I'm working to support that. Or just send in a pull request :)</em>
+</li>
+</ul>
+
+<h2>
+<a id="process-injection" class="anchor" href="#process-injection" aria-hidden="true"><span class="octicon octicon-link"></span></a>Process Injection</h2>
+
+<ul>
+<li>Support for config injection to add new processes without restarting zist is in dev. <em>Basically Live Config Reloading.</em>
+</li>
+</ul>
+
+<h1>
+<a id="note" class="anchor" href="#note" aria-hidden="true"><span class="octicon octicon-link"></span></a>NOTE</h1>
+
+<ul>
+<li>Still under moderately heavy development so expect some changes</li>
+<li>Still undergoing refactoring</li>
+<li>Mail Logging is not complete but other supervisor functions are OK.</li>
+</ul>
       </section>
     </div>
 
-    <!-- FOOTER  -->
-    <div id="footer_wrap" class="outer">
-      <footer class="inner">
-        <p class="copyright">Zist maintained by <a href="https://github.com/ziscky">ziscky</a></p>
-        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
-      </footer>
-    </div>
-
     
-
   </body>
 </html>
