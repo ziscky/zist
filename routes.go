@@ -83,6 +83,7 @@ func Default(rw http.ResponseWriter, r *http.Request) {
 			"pid":         proc.PID,
 			"name":        proc.Pname,
 			"path":        proc.PPath,
+			"args":        proc.Args,
 			"numrestarts": proc.RestartCount,
 			"timestarted": proc.Timestamp.String(),
 			"timealive":   time.Since(proc.Timestamp).String(),
@@ -105,7 +106,10 @@ func Start(rw http.ResponseWriter, r *http.Request) {
 	pid := GetVar(r, "pid").(int)
 	defer RemoveVars(r)
 
-	if err := proc.Initialize(proc.PPath); err != nil {
+	procstrct := process{
+		Path: proc.PPath,
+	}
+	if err := proc.Initialize(procstrct); err != nil {
 		http.Error(rw, err.Error(), http.StatusNotFound)
 		return
 	}
@@ -126,7 +130,10 @@ func Restart(rw http.ResponseWriter, r *http.Request) {
 
 	proc.Kill()
 
-	if err := proc.Initialize(proc.PPath); err != nil {
+	procstrct := process{
+		Path: proc.PPath,
+	}
+	if err := proc.Initialize(procstrct); err != nil {
 		http.Error(rw, err.Error(), http.StatusNotFound)
 		return
 	}

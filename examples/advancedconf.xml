@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <app>
-	
+
 <endpoint>
 	<protocol>http</protocol><!-- https/http -->
 	<port>9091</port>
@@ -35,17 +35,17 @@
 <processes>
 	<process type="simple">
 		<pName>xm</pName>
-		<!--Full path to the .sh responsible for invoking your process(that way you can invoke it using all the 
+		<!--Full path to the .sh responsible for invoking your process(that way you can invoke it using all the
 		commands you want). Don't let the script run it in the background. i.e(&)-->
-		<pPath>/home/eziscky/Golang/src/github.com/Ziscky/tests/xm.sh</pPath> 
+		<pPath>/home/eziscky/Golang/src/github.com/Ziscky/tests/xm.sh</pPath>
 		<restart>on</restart>
 	</process>
 
-	<process type="swiss">
+	<process type="swiss" args="-v">
 		<pName>xm</pName>
-		<!--Full path to the .sh responsible for invoking your process(that way you can invoke it using all the 
+		<!--Full path to the .sh responsible for invoking your process(that way you can invoke it using all the
 		commands you want). Don't let the script run it in the background. i.e(&)-->
-		<pPath>/home/eziscky/Golang/src/github.com/Ziscky/tests/xm.sh</pPath> 
+		<pPath>/home/eziscky/Golang/src/github.com/Ziscky/tests/xm.sh</pPath>
 		<restart>on</restart>
 		<!-- where you store error logs or any other file your program outputs that you want emailed to you. -->
 		<pLogs>
@@ -56,7 +56,7 @@
 				<mail>on</mail>
 			</log>
 		</pLogs>
-		
+
 		<out>
 			<stdout>
 				<web>on</web>
@@ -70,7 +70,7 @@
 			</stderr>
 			<stats>
 				<web>on</web>
-			</stats>	
+			</stats>
 		</out>
 
 		<crashreporting enable="true">
@@ -84,7 +84,7 @@
 					<to>ee@gmail.com</to>
 				</tos>
 				<subject>Pager Duty</subject>
-				<!-- 
+				<!--
 					If you set the body to:
 						log i.e <body>log</body>, The error log (if any) is sent to the set email receivers.
 						stdout The dump of the stdout of the process is sent

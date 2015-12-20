@@ -58,6 +58,7 @@ type Processes struct {
 type process struct {
 	Name        xml.Name    `xml:"process"`
 	Type        string      `xml:"type,attr"`
+	Args        string      `xml:"args,attr"`
 	Pname       string      `xml:"pName"`
 	Path        string      `xml:"pPath"`
 	Restart     string      `xml:"restart"`

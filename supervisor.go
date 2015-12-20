@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -14,6 +15,9 @@ var (
 	activeProcesses map[int]*ChildProcess
 	procLock        sync.RWMutex
 )
+
+//TODO: flag for process threshold-> min start time to avoid restarting failing procs
+//TODO: add support to check if process is using any ports for listening/connecting
 
 func AddProcess(cp *ChildProcess) {
 	procLock.Lock()
@@ -29,16 +33,18 @@ func RemoveProcess(cp *ChildProcess) {
 
 func RegisterProcess(ps process, rcount int) error {
 	cp := new(ChildProcess)
+	//log.Println(ps.Args)
 	if _, err := os.Stat(ps.Path); os.IsNotExist(err) {
 		log.Println(ps.Path, " does not exist")
 		return err
 	}
-	if err := cp.Initialize(ps.Path); err != nil {
-		log.Println(err)
+	if err := cp.Initialize(ps); err != nil {
+		log.Println("initialize", err)
 		return err
 	}
 	cp.Pname = ps.Pname
 	cp.PPath = ps.Path
+	cp.Args = ps.Args
 	cp.IsAlive = true
 	cp.RestartCount = rcount
 
@@ -67,8 +73,9 @@ func RegisterProcess(ps process, rcount int) error {
 	}
 
 	AddProcess(cp)
+	fmt.Println("[*]", cp.Pname, "started successfully.")
 	if err := cp.Proc.Wait(); err != nil {
-		log.Println(cp.PPath, "Non zero exit: ", err)
+		fmt.Println("[*]", cp.Pname, "Non zero exit: ", err)
 	}
 
 	if !cp.KillSwitch {
@@ -82,9 +89,17 @@ func RegisterProcess(ps process, rcount int) error {
 		RemoveProcess(cp)
 	}
 	if !cp.DetachF {
-		activeProcesses[cp.PID].IsAlive = false
+		if _, ok := activeProcesses[cp.PID]; ok {
+			activeProcesses[cp.PID].IsAlive = false
+		}
 	}
 	return nil
+}
+
+//AttachProcess invokes ps -ef and greps
+//for  the path then launching it the normal process invocation structure
+func AttachProcess(rw http.ResponseWriter, r *http.Request) {
+	//	pid := r.FormValue("pid")
 }
 
 var (
@@ -104,8 +119,10 @@ func main() {
 		return
 	}
 	activeProcesses = make(map[int]*ChildProcess)
+
 	for _, ps := range appConf.Ps.Pss {
 		go RegisterProcess(ps, 0)
+		//log.Println(ps.Pname)
 	}
 
 	router := mux.NewRouter()
