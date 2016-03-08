@@ -1,10 +1,28 @@
+/*
+Copyright (C) 2016  Eric Ziscky
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+*/
 package main
 
 import (
 	"bufio"
-	"time"
+
 )
 
+//LogStdOut redirects the process stdout to the cp array
 func LogStdOut(cp *ChildProcess) {
 	stdOutScanner := bufio.NewScanner(cp.StdOutR)
 	for stdOutScanner.Scan() {
@@ -12,6 +30,7 @@ func LogStdOut(cp *ChildProcess) {
 	}
 }
 
+//LogStdErr redirects the process stderr to the cp array
 func LogStdErr(cp *ChildProcess) {
 	stdErrScanner := bufio.NewScanner(cp.StdErrR)
 	for stdErrScanner.Scan() {
@@ -19,38 +38,3 @@ func LogStdErr(cp *ChildProcess) {
 	}
 }
 
-func SendPLogs(pl plog, cp *ChildProcess) {
-	ticker := time.NewTicker(time.Duration(pl.Interval) * time.Minute)
-	stop := make(chan struct{})
-	for {
-		select {
-		case <-ticker.C:
-			if pl.Mail == "on" {
-				//send mail
-			}
-			if pl.Twitter == "on" {
-				//post to twitter
-			}
-		case <-stop:
-			ticker.Stop()
-		}
-	}
-}
-func CrashReport(ps process) {
-	if len(ps.CrashReport.Mail.Rcps) > 0 {
-		if ps.CrashReport.Mail.Body == "log" {
-		}
-		if ps.CrashReport.Mail.Body == "stderr" {
-		}
-		if ps.CrashReport.Mail.Body == "stdout" {
-		}
-		if ps.CrashReport.Mail.Body == "combined" {
-		}
-		//send body
-	}
-	if ps.CrashReport.Twitter.Message != "" {
-		//tweet message and hashtag
-	}
-}
-func StreamOutToTwitter(cp *ChildProcess) {}
-func AirDirtyLaundry(cp *ChildProcess)    {}

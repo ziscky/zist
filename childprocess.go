@@ -1,6 +1,25 @@
+/*
+Copyright (C) 2016  Eric Ziscky
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+*/
 package main
 
 import (
+	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -45,7 +64,7 @@ type ChildProcess struct {
 //Initialize creates the process instance
 //redirects stdout and stderr to internal pipes
 //starts the process
-func (cp *ChildProcess) Initialize(ps process) error {
+func (cp *ChildProcess) Initialize(ps Job,numrestarts int) error {
 	wd, bname := getWD(ps.Path)
 	if err := os.Chdir(wd); err != nil {
 		return err
@@ -60,11 +79,18 @@ func (cp *ChildProcess) Initialize(ps process) error {
 	cp.StdErrR, cp.StdErrWr = io.Pipe()
 	cp.Proc.Stdout = cp.StdOutWr
 	cp.Proc.Stderr = cp.StdErrWr
+    cp.RestartCount += numrestarts
+    if ps.Workingdir != ""{
+        cp.Proc.Dir = ps.Workingdir
+    }else{
+        cp.Proc.Dir = wd
+    }
 	if err := cp.Proc.Start(); err != nil {
 		return err
 	}
 	cp.PID = cp.Proc.Process.Pid
 	cp.Timestamp = time.Now()
+    cp.IsAlive = true
 	return nil
 }
 
@@ -118,11 +144,50 @@ func (cp *ChildProcess) AppendError(errorStr string) {
 	defer cp.lock.Unlock()
 	cp.Errors = append(cp.Errors, errorStr)
 }
+
+//AppendOutput stores stdout info from the stdout of the process
+//to the internal slice
 func (cp *ChildProcess) AppendOutput(outputStr string) {
 	cp.lock.Lock()
 	defer cp.lock.Unlock()
 	cp.Output = append(cp.Output, outputStr)
 }
+
+//ClearErrorBuff clears the process error buffer with an option to store it to a file
+func (cp *ChildProcess) ClearErrorBuff(store int) {
+	cp.lock.Lock()
+	defer cp.lock.Unlock()
+	if store > 0 {
+		file, err := os.OpenFile("stderr", os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0666)
+		if err != nil {
+			fmt.Println("[*] Error writing error buffer to file. Ensure correct permissions")
+		}
+		errbytes, _ := json.Marshal(cp.Errors)
+		if _, err := io.WriteString(file, string(errbytes)); err != nil {
+			fmt.Println("[*] Error writing error buffer to file. Ensure correct permissions")
+		}
+	}
+	cp.Errors = cp.Errors[:0]
+}
+
+//ClearStdoutBuff clears the process stdout buffer with an option to store it to a file
+func (cp *ChildProcess) ClearStdoutBuff(store int) {
+	cp.lock.Lock()
+	defer cp.lock.Unlock()
+	if store > 0 {
+		file, err := os.Open("stdout")
+		if err != nil {
+			fmt.Println("[*] Error writing stdout buffer to file. Ensure correct permissions")
+		}
+		errbytes, _ := json.Marshal(cp.Errors)
+		if _, err := io.WriteString(file, string(errbytes)); err != nil {
+			fmt.Println("[*] Error writing stdout buffer to file. Ensure correct permissions")
+		}
+	}
+	cp.Output = cp.Output[:0]
+}
+
+//Detach disowns the child process
 func (cp *ChildProcess) Detach() error {
 	cp.DetachF = true
 	cp.Kill()

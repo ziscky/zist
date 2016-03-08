@@ -1,0 +1,7 @@
+*.xml
+*.exe
+*.test
+*.prof
+*.conf
+*.toml
+zist
