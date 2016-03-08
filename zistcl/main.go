@@ -383,7 +383,7 @@ func readLocalConfig() error{
        return nil
 }
 
-//TODO: prints usage
+
 func printUsage(){
     fmt.Println(`Usage: zistcl host:port token [cmd] or zistcl -l [cmd] #for local connection
         CMDS: kill - kill zistd but detach monitored procs to continue running on their own
