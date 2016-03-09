@@ -349,5 +349,22 @@ func readLocalConfig() error{
 
 //TODO: prints usage
 func printUsage(){
-    log.Println("usage")
+   fmt.Println(`
+   Usage: zistcl host:port token [cmd] or zistcl -l [cmd] #for local connection
+        CMDS: kill - kill zistd but detach monitored procs to continue running on their own
+              kill all - kill zistd and monitored procs
+              status - get status of zistd
+              reload - reload zistd monitored process config files
+              log - get the contents of the zistd log file
+              log clear - clear the contents of the zistd log file
+              example: zistcl 1.1.1.1:2000 kill all
+              
+        PROCESS CMDS: i.e zistcl host:port -l [processname] [cmd] or zistcl -l [processname] [cmd]
+              status - get status of the named process
+              restart - restart the named process
+              stop - stop the named process
+              detach - detach the named process from zistd
+              start - start the named process
+              example: zistcl -l app1 restart
+   `)
 }
