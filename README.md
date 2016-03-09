@@ -6,12 +6,7 @@
 
 ##Supervisor functions
 Register processes to be started and monitored in a familiar way using an easy to write toml file.
-Sample:
-Name = "app1"
-Path = "/path/to/app1"
-Args = "-your -app -args"
-Restart = true
-Web = true
+Sample: (Check Below)
 
 
 ## Live Process Interaction via web API and RPC client
@@ -91,7 +86,7 @@ To generate a secure token:
 
 ###Interaction
 
-There are 2 ways to interact with a running zistd instances.
+There are 2 ways to interact with a running zistd instance.
 ####1. zistcl
        zistcl is a commandline tool to interact with zistd.(Kinda like supervisord supervisorctl relationship)
        *You can get the following info and more by running zistcl -h*
@@ -122,3 +117,4 @@ There are 2 ways to interact with a running zistd instances.
     - Beta software do not use in prod
     - Feel free to contribute
     - Tell me what you do with it
+    - Works on Linux only
