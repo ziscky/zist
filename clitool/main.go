@@ -347,7 +347,7 @@ func readLocalConfig() error{
        return nil
 }
 
-//TODO: prints usage
+//printUsage prints the zistcl usage instructions
 func printUsage(){
    fmt.Println(`
    Usage: zistcl host:port token [cmd] or zistcl -l [cmd] #for local connection
