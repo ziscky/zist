@@ -37,7 +37,7 @@ Web = true
 
 ###Building from source
 You will need to install Go (*https://golang.org*)
-You can clone this repo: *https://github.com/ziscky/zist* or use go get *https://github.com/ziscky/zist*
+You can clone this repo: *https://github.com/ziscky/zist* or use go get *github.com/ziscky/zist*
 In the zist directory run the bash script *build.sh*
 Run *sudo zist install*, or not *sudo* if you have correct permissions for:
         - /usr/bin
