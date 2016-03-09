@@ -1,34 +1,25 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en-us">
   <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta charset="UTF-8">
     <title>Zist by ziscky</title>
-
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/github-light.css">
-    <meta name="viewport" content="width=device-width">
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
   </head>
   <body>
-    <div class="wrapper">
-      <header>
-        <h1>Zist</h1>
-        <p>Think supervisord with remote commandeering via RPC.</p>
+    <section class="page-header">
+      <h1 class="project-name">Zist</h1>
+      <h2 class="project-tagline">Think supervisord with remote commandeering via RPC.</h2>
+      <a href="https://github.com/ziscky/zist" class="btn">View on GitHub</a>
+      <a href="https://github.com/ziscky/zist/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/ziscky/zist/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
 
-        <p class="view"><a href="https://github.com/ziscky/zist">View the Project on GitHub <small>ziscky/zist</small></a></p>
-
-
-        <ul>
-          <li><a href="https://github.com/ziscky/zist/zipball/master">Download <strong>ZIP File</strong></a></li>
-          <li><a href="https://github.com/ziscky/zist/tarball/master">Download <strong>TAR Ball</strong></a></li>
-          <li><a href="https://github.com/ziscky/zist">View On <strong>GitHub</strong></a></li>
-        </ul>
-      </header>
-      <section>
-        <h1>
+    <section class="main-content">
+      <h1>
 <a id="zist" class="anchor" href="#zist" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><strong>zist</strong>
 </h1>
 
@@ -43,12 +34,7 @@
 <a id="supervisor-functions" class="anchor" href="#supervisor-functions" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Supervisor functions</h2>
 
 <p>Register processes to be started and monitored in a familiar way using an easy to write toml file.
-Sample:
-Name = "app1"
-Path = "/path/to/app1"
-Args = "-your -app -args"
-Restart = true
-Web = true</p>
+Sample: (Check Below)</p>
 
 <h2>
 <a id="live-process-interaction-via-web-api-and-rpc-client" class="anchor" href="#live-process-interaction-via-web-api-and-rpc-client" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Live Process Interaction via web API and RPC client</h2>
@@ -94,7 +80,7 @@ can simply detach it after you're done monitoring it
 <a id="building-from-source" class="anchor" href="#building-from-source" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Building from source</h3>
 
 <p>You will need to install Go (<em><a href="https://golang.org">https://golang.org</a></em>)
-You can clone this repo: <em><a href="https://github.com/ziscky/zist">https://github.com/ziscky/zist</a></em> or use go get <em><a href="https://github.com/ziscky/zist">https://github.com/ziscky/zist</a></em>
+You can clone this repo: <em><a href="https://github.com/ziscky/zist">https://github.com/ziscky/zist</a></em> or use go get <em>github.com/ziscky/zist</em>
 In the zist directory run the bash script <em>build.sh</em>
 Run <em>sudo zist install</em>, or not <em>sudo</em> if you have correct permissions for:
         - /usr/bin
@@ -155,7 +141,7 @@ To generate a secure token:
 <h3>
 <a id="interaction" class="anchor" href="#interaction" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Interaction</h3>
 
-<p>There are 2 ways to interact with a running zistd instances.</p>
+<p>There are 2 ways to interact with a running zistd instance.</p>
 
 <h4>
 <a id="1-zistcl" class="anchor" href="#1-zistcl" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>1. zistcl</h4>
@@ -194,14 +180,17 @@ To generate a secure token:
 <pre><code>- Beta software do not use in prod
 - Feel free to contribute
 - Tell me what you do with it
+- Works on Linux only
 </code></pre>
-      </section>
-      <footer>
-        <p>This project is maintained by <a href="https://github.com/ziscky">ziscky</a></p>
-        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/ziscky/zist">Zist</a> is maintained by <a href="https://github.com/ziscky">ziscky</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
       </footer>
-    </div>
-    <script src="javascripts/scale.fix.js"></script>
-    
+
+    </section>
+
+  
   </body>
 </html>
