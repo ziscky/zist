@@ -100,12 +100,12 @@ func (comm *Communicator) ProcessStatus(name string,msg *string) error{
 			"timealive":   time.Since(proc.Timestamp).String(),
 			"isalive":     proc.IsAlive,
            }
-           payloadJson,err := json.Marshal(payload)
+           payloadJSON,err := json.Marshal(payload)
            if err != nil{
                log.Println(err)
                return err
            }
-           *msg = string(payloadJson)
+           *msg = string(payloadJSON)
            return nil
        }
    }
@@ -185,6 +185,74 @@ func (comm *Communicator) ProcessStart(name string,msg *string) error{
    *msg = "No such process"
    return nil
 }
+
+//ProcessStats gets the monitored  process stats by name
+func (comm *Communicator) ProcessStats(name string,msg *string) error{
+    for _,proc := range activeProcesses{
+       if proc.Pname == name{
+           stats,err  := proc.Stats()
+           if err != nil{
+               *msg = err.Error()
+               return err
+           }
+           encodedstats,_ :=  json.Marshal(stats)
+           *msg = string(encodedstats)
+           return nil
+       }
+   }
+   *msg = "No such process"
+   return nil
+}
+//ProcessStdErr gets the process stderr output by name
+func (comm *Communicator) ProcessStdErr(name string,msg *string) error{
+    for _,proc := range activeProcesses{
+       if proc.Pname == name{
+           stats := proc.GetErrors()
+           
+           encodedstats,_ :=  json.Marshal(stats)
+           *msg = string(encodedstats)
+           return nil
+       }
+   }
+   *msg = "No such process"
+   return nil
+}
+//ProcessStdOut gets the process stdout output by name
+func (comm *Communicator) ProcessStdOut(name string,msg *string) error{
+    for _,proc := range activeProcesses{
+       if proc.Pname == name{
+           stats  := proc.GetErrors()
+           
+           encodedstats,_ :=  json.Marshal(stats)
+           *msg = string(encodedstats)
+           return nil
+       }
+   }
+   *msg = "No such process"
+   return nil
+}
+
+//All gets all monitored process info
+func (comm *Communicator) All(_ int,msg *string) error{
+    var payloads []map[string]interface{}
+    for _,proc := range activeProcesses{
+           payload := map[string]interface{}{
+                "pid":         proc.PID,
+                "name":        proc.Pname,
+                "path":        proc.PPath,
+                "args":        proc.Args,
+                "numrestarts": proc.RestartCount,
+                "timestarted": proc.Timestamp.String(),
+                "timealive":   time.Since(proc.Timestamp).String(),
+                "isalive":     proc.IsAlive,
+           }
+           payloads = append(payloads,payload)
+       }
+       payloadJSON,_ := json.Marshal(payloads)
+       *msg = string(payloadJSON)
+       return nil
+   }
+
 
 //ReadLog reads zistd output log
 func (comm *Communicator) ReadLog(_ int,msg *string) error{
