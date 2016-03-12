@@ -70,6 +70,25 @@ func DStatus(client *rpc.Client) (string,error){
     return "zistd is not running",nil
 }
 
+//GetLog gets the contents of zistd log file
+func GetLog(client *rpc.Client) (string,error){
+     var status string
+     return status,client.Call("Communicator.ReadLog",0,&status)
+}
+
+//ClearLog clears the contents of the zistd log file
+func ClearLog(client *rpc.Client) (string,error){
+    var status string
+    return status,client.Call("Communicator.ClearLog",0,&status)
+}
+
+//ProcAll gets the details of all monitored processes
+func ProcAll(client *rpc.Client) (string,error){
+    var status string
+    return status,client.Call("Communicator.All",0,&status)
+}
+
+
 //VerifyToken authenticates the zistcl request to zistd
 func VerifyToken(client *rpc.Client,token string) (bool,error){
     var valid bool
@@ -110,17 +129,24 @@ func ProcStop(client *rpc.Client,pname string) (string,error){
     return status,client.Call("Communicator.ProcessStop",pname,&status)
 }
 
-//GetLog gets the contents of zistd log file
-func GetLog(client *rpc.Client) (string,error){
-     var status string
-     return status,client.Call("Communicator.ReadLog",0,&status)
+//ProcStderr gets the process stderr by name
+func ProcStderr(client *rpc.Client,pname string) (string,error){
+    var status string
+    return status,client.Call("Communicator.ProcessStdErr",pname,&status)
 }
 
-//ClearLog clears the contents of the zistd log file
-func ClearLog(client *rpc.Client) (string,error){
+//ProcStdout gets the stdout of a monitored process by name
+func ProcStdout(client *rpc.Client,pname string) (string,error){
     var status string
-    return status,client.Call("Communicator.ClearLog",0,&status)
+    return status,client.Call("Communicator.ProcessStdOut",pname,&status)
 }
+
+//ProcStats gets the stats of a monitored process by name
+func ProcStats(client *rpc.Client,pname string) (string,error){
+    var status string
+    return status,client.Call("Communicator.ProcessStats",pname,&status)
+}
+
 
  var arg1,arg2,arg3,arg4 string
 
@@ -232,6 +258,18 @@ func main() {
         printUsage()
         return
     }
+    
+ 
+    if arg3 == "all"{
+        stat,err := ProcAll(client)
+        if err != nil{
+            log.Println(err)
+            return
+        }
+        fmt.Println("[*]",stat)
+        return
+    }
+    
     //handle status    
     if arg3 == "status"{
         stat,err1 := DStatus(client)
@@ -342,6 +380,30 @@ func main() {
         }
         fmt.Println("[*]",stat)
         return
+      case "stderr":
+        stat,err := ProcStderr(client,arg3)
+        if err != nil{
+            log.Println(err)
+            return
+        }
+        fmt.Println("[*]",stat)
+        return
+      case "stdout":
+        stat,err := ProcStdout(client,arg3)
+        if err != nil{
+            log.Println(err)
+            return
+        }
+        fmt.Println("[*]",stat)
+        return
+      case "stats":
+        stat,err := ProcStats(client,arg3)
+        if err != nil{
+            log.Println(err)
+            return
+        }
+        fmt.Println("[*]",stat)
+        return
        default:
         fmt.Println("[*] Unknown command",arg4)
         return
@@ -389,6 +451,7 @@ func printUsage(){
         CMDS: kill - kill zistd but detach monitored procs to continue running on their own
               kill all - kill zistd and monitored procs
               status - get status of zistd
+              all - gets all process statuses
               reload - reload zistd monitored process config files
               log - get the contents of the zistd log file
               log clear - clear the contents of the zistd log file
@@ -400,6 +463,9 @@ func printUsage(){
               stop - stop the named process
               detach - detach the named process from zistd
               start - start the named process
+              stats - gets the named process stats
+              stderr - gets the named process stderr
+              stdout - gets the named process stdout
               example: zistcl -l app1 restart`)
    
 }
