@@ -80,7 +80,7 @@ func createDefaultConfig() error{
     if  f,err := os.OpenFile("/etc/zist/conf.toml",os.O_CREATE | os.O_RDWR,0777); err != nil{
         return err
     }else{
-        if _,err := f.WriteString("Confdir = \"/etc/zist/conf.d\"\nWeb = true\nProtocol = \"http\"\nHTTPPort = 7000\nRPCPort = 9876\n"); err != nil{
+        if _,err := f.WriteString("Confdir = \"/etc/zist/conf.d\"\nWeb = true\nProtocol = \"http\"\nHTTPPort = 7000\nRPCPort = 9876\nToken = "); err != nil{
          return err
         }
     }

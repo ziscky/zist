@@ -72,7 +72,7 @@ func ZistConf() error{
            return err1
        }
        if appConf.Token == ""{
-           return errors.New("[*] Token cant be empty")
+           return errors.New("[*] Token cant be empty. Run `sudo zistd generate` to create a secure token. Edit /etc/zist/conf.toml")
        }
        if appConf.RPCPort == 0{
            return errors.New("[*] RPC port needed")
