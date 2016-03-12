@@ -166,7 +166,7 @@ func main() {
             fmt.Println("[*]","Can't create log file.Not enough priviledges.")
             return
         }
-        fmt.Println(err.Error())
+        fmt.Println(ferr.Error())
         return
 	}
 	defer f.Close()
