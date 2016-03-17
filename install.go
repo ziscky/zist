@@ -21,17 +21,50 @@ import(
     "fmt"
     "os"
     "os/exec"
+    "path/filepath"
     "log"
+    "path"
     "errors"
+    "bufio"
 )
 
 //install 
 //makes the conf dir 
 //creates default conf.toml
 //creates conf.d/
-//TODO: move binaries
+
+
+var(
+    //INSTALL_DIR is the location of the zist config install
+     INSTALL_DIR = "/etc/zist"
+     //BINARY_DIR is the location of the zist bins
+     BINARY_DIR = "/usr/bin"
+)
+
+func readConfigInput(configonly int){
+    scanner := bufio.NewScanner(os.Stdin)
+    
+        fmt.Print("Config Installation Path (leave blank for default: /etc/zist ): ")
+        scanner.Scan()
+        text := scanner.Text()
+        if len(text) > 0{
+            INSTALL_DIR = text
+        }
+        if configonly > 0{
+            return
+        }
+    
+    fmt.Print("Binary Installation Path (leave blank for default: /usr/bin ): ")
+    scanner.Scan()
+    text2 := scanner.Text()
+    if len(text2) > 0{
+        BINARY_DIR = text2
+    }
+}
 func install() error{
-    if  _,err := os.Stat("/etc/zist"); err != nil{
+    //ask user for install dir
+    readConfigInput(0)
+    if  _,err := os.Stat(INSTALL_DIR); err != nil{
         if os.IsPermission(err){
             log.Println("Run with correct permissions")
             return err
@@ -47,7 +80,7 @@ func install() error{
             return err
         }
     }
-    if _, err := os.Stat("/etc/zist/conf.toml"); err != nil{
+    if _, err := os.Stat(path.Join(INSTALL_DIR,"conf.toml")); err != nil{
         if os.IsNotExist(err){
             if err := createDefaultConfig(); err != nil{
                 log.Println(err)
@@ -58,7 +91,10 @@ func install() error{
             return err
         }
     }
-    
+    if err := createLogFile();err != nil{
+        log.Println(err)
+        return err
+    }
     if err := createConfDir(); err != nil{
         log.Println(err)
         return err
@@ -69,22 +105,29 @@ func install() error{
     return nil
 }
 func makeDir() error{
-    return os.MkdirAll("/etc/zist",0777)
+    return os.MkdirAll(INSTALL_DIR,0777)
 }
 
 func createConfDir() error{
-    return os.MkdirAll("/etc/zist/conf.d",0777)
+    return os.MkdirAll(path.Join(INSTALL_DIR,"conf.d"),0777)
 }
 
 func createDefaultConfig() error{
-    if  f,err := os.OpenFile("/etc/zist/conf.toml",os.O_CREATE | os.O_RDWR,0777); err != nil{
+    if  f,err := os.OpenFile(path.Join(INSTALL_DIR,"conf.toml"),os.O_CREATE | os.O_RDWR,0777); err != nil{
         return err
     }else{
-        if _,err := f.WriteString("Confdir = \"/etc/zist/conf.d\"\nWeb = true\nProtocol = \"http\"\nHTTPPort = 7000\nRPCPort = 9876\nToken = "); err != nil{
+        if _,err := f.WriteString("Confdir = \""+ path.Join(INSTALL_DIR + "/conf.d") +"\"\nWeb = true\nProtocol = \"http\"\nHTTPPort = 7000\nRPCPort = 9876\nToken = \"changeme\""); err != nil{
          return err
         }
     }
     
+    return nil
+}
+
+func createLogFile() error{
+    if _,err := os.OpenFile(path.Join(INSTALL_DIR,"error.log"),os.O_CREATE | os.O_RDWR,0777); err != nil{
+       return err 
+    }
     return nil
 }
 
@@ -117,8 +160,13 @@ func copyZistBinaries() error{
         fmt.Println(err.Error())
         return err
     }
-    if err := exec.Command("cp","bin/zistcl","/usr/bin/zistcl").Run(); err != nil{
-        fmt.Println("[*] Ensure you have suitable priviledges in /usr/bin")
+    
+     if err := createBinaryConf(0); err != nil{
+         return err
+     }
+    
+    if err := exec.Command("cp","bin/zistcl",path.Join(BINARY_DIR,"zistcl")).Run(); err != nil{
+        fmt.Println("[*] Ensure you have suitable priviledges in",BINARY_DIR)
         return err
     }
     
@@ -131,10 +179,37 @@ func copyZistBinaries() error{
         return err
         
     }
-    if  err := exec.Command("cp","bin/zistd","/usr/bin/zistd").Run(); err != nil{
-        fmt.Println("[*] Ensure you have suitable priviledges in /usr/bin")
+    if  err := exec.Command("cp","bin/zistd",path.Join(BINARY_DIR,"zistd")).Run(); err != nil{
+        fmt.Println("[*] Ensure you have suitable priviledges in",BINARY_DIR)
         return err
     }
+
     fmt.Println("[*] Succesfully installed the zist binaries.")
+    return nil
+}
+
+func createBinaryConf(wdir int) error{
+    var f *os.File
+    var err  error
+    dir,_ := filepath.Abs(filepath.Dir(os.Args[0]))//current binary directory
+    if wdir > 0{
+        f,err = os.OpenFile(path.Join(dir,".conf"),os.O_CREATE | os.O_RDWR,0777)
+    }else{
+        f,err = os.OpenFile(path.Join(BINARY_DIR,".conf"),os.O_CREATE | os.O_RDWR,0777)
+    }
+    if err != nil{
+        if wdir > 0{
+            fmt.Println("[*] Unable to move configuration data to",dir)
+        }else{
+            fmt.Println("[*] Unable to move configuration data to",BINARY_DIR)
+        }
+        return err
+    }
+    defer f.Close()
+    if wdir > 0{
+        f.WriteString(INSTALL_DIR + "\n" + dir)
+    }else{
+        f.WriteString(INSTALL_DIR + "\n" + BINARY_DIR)
+    }
     return nil
 }

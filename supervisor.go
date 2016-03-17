@@ -160,7 +160,10 @@ func listenRPC() (net.Listener,error){
 
 
 func main() {
-    f, ferr := os.OpenFile("/etc/zist/error.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+    if parseCommand(){
+        return
+    }
+    f, ferr := os.OpenFile("error.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if ferr != nil {
 		if os.IsPermission(ferr){
             fmt.Println("[*]","Can't create log file.Not enough priviledges.")
@@ -170,24 +173,30 @@ func main() {
         return
 	}
 	defer f.Close()
-    log.SetOutput(f)
-    if parseCommand(){
-        return
-    }
     
 	// confPath := flag.String("conf", "", "-conf=/path/to/conffile")
 	keyfile := flag.String("keyfile", "", "-keyfile=path/to/keyfile")
 	certfile := flag.String("certfile", "", "-certfile=path/to/certfile")
 	flag.Parse()
-
+    
+      if err := BinaryConf(); err != nil{
+        fmt.Println("[*] Fatal:",err.Error())
+        return
+    }
+    
 	if err = ZistConf(); err != nil{
         fmt.Println("[*] Fatal:",err.Error())
         return
     }
+    
+  
+    
     if err = ReadConfig(); err != nil{
+        log.Println(err.Error())
         return
     }
-    
+    log.SetOutput(f)
+    log.Println(1)
 	activeProcesses = make(map[int]*ChildProcess)
 
 	for _, job := range jobs {

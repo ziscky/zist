@@ -256,7 +256,7 @@ func (comm *Communicator) All(_ int,msg *string) error{
 
 //ReadLog reads zistd output log
 func (comm *Communicator) ReadLog(_ int,msg *string) error{
-    f, err := os.OpenFile("/etc/zist/error.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+    f, err := os.OpenFile("error.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
 		*msg = err.Error()
         return err
@@ -272,7 +272,7 @@ func (comm *Communicator) ReadLog(_ int,msg *string) error{
 
 //ClearLog clears zistd output log
 func (comm  *Communicator) ClearLog(_ int,msg *string) error{
-    f, err := os.OpenFile("/etc/zist/error.log", os.O_RDWR|os.O_CREATE, 0666)
+    f, err := os.OpenFile("error.log", os.O_RDWR|os.O_CREATE, 0666)
 	if err != nil {
 		*msg = err.Error()
         return err
