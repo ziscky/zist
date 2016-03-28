@@ -1,0 +1,46 @@
+2016/03/23 12:37:04 1
+2016/03/23 12:37:04 client
+2016/03/23 12:37:04 microm
+2016/03/23 12:37:04 superadmin
+2016/03/23 12:37:04 supervisor
+2016/03/23 12:37:04 agent
+2016/03/23 12:37:04 microm is exiting too quick. Backing off. Start Explicitly
+2016/03/23 12:37:04 agent is exiting too quick. Backing off. Start Explicitly
+2016/03/23 12:37:04 client is exiting too quick. Backing off. Start Explicitly
+2016/03/23 14:01:29 os: process already finished
+2016/03/23 14:01:30 supervisor
+2016/03/23 14:01:30 microm
+2016/03/23 14:01:30 agent
+2016/03/23 14:01:30 candidate
+2016/03/23 14:01:30 superadmin
+2016/03/23 14:01:30 client
+2016/03/23 14:04:45 os: process already finished
+2016/03/23 14:04:45 agent
+2016/03/23 14:04:45 supervisor
+2016/03/23 14:04:45 microm
+2016/03/23 14:04:45 client
+2016/03/23 14:04:45 candidate
+2016/03/23 14:04:45 superadmin
+2016/03/23 14:04:45 client is exiting too quick. Backing off. Start Explicitly
+2016/03/23 14:45:20 client
+2016/03/23 14:45:20 microm
+2016/03/23 14:45:20 candidate
+2016/03/23 14:45:20 agent
+2016/03/23 14:45:20 superadmin
+2016/03/23 14:45:20 supervisor
+2016/03/23 14:45:21 client is exiting too quick. Backing off. Start Explicitly
+2016/03/23 15:16:24 client
+2016/03/23 15:16:24 agent
+2016/03/23 15:16:24 microm
+2016/03/23 15:16:24 candidate
+2016/03/23 15:16:24 superadmin
+2016/03/23 15:16:24 supervisor
+2016/03/23 15:16:24 client is exiting too quick. Backing off. Start Explicitly
+2016/03/23 15:16:24 candidate is exiting too quick. Backing off. Start Explicitly
+2016/03/23 16:40:50 supervisor
+2016/03/23 16:40:50 client
+2016/03/23 16:40:50 agent
+2016/03/23 16:40:50 candidate
+2016/03/23 16:40:50 microm
+2016/03/23 16:40:50 superadmin
+2016/03/23 17:17:32 candidate

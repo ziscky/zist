@@ -64,7 +64,7 @@ type ChildProcess struct {
 //Initialize creates the process instance
 //redirects stdout and stderr to internal pipes
 //starts the process
-func (cp *ChildProcess) Initialize(ps Job,numrestarts int) error {
+func (cp *ChildProcess) Initialize(ps Job, numrestarts int) error {
 	wd, bname := getWD(ps.Path)
 	if err := os.Chdir(wd); err != nil {
 		return err
@@ -79,18 +79,18 @@ func (cp *ChildProcess) Initialize(ps Job,numrestarts int) error {
 	cp.StdErrR, cp.StdErrWr = io.Pipe()
 	cp.Proc.Stdout = cp.StdOutWr
 	cp.Proc.Stderr = cp.StdErrWr
-    cp.RestartCount += numrestarts
-    if ps.Workingdir != ""{
-        cp.Proc.Dir = ps.Workingdir
-    }else{
-        cp.Proc.Dir = wd
-    }
+	cp.RestartCount += numrestarts
+	if ps.Workingdir != "" {
+		cp.Proc.Dir = ps.Workingdir
+	} else {
+		cp.Proc.Dir = wd
+	}
 	if err := cp.Proc.Start(); err != nil {
 		return err
 	}
 	cp.PID = cp.Proc.Process.Pid
 	cp.Timestamp = time.Now()
-    cp.IsAlive = true
+	cp.IsAlive = true
 	return nil
 }
 

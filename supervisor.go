@@ -18,19 +18,19 @@ Copyright (C) 2016  Eric Ziscky
 package main
 
 import (
+	"crypto/rand"
+	"encoding/base64"
 	"flag"
 	"fmt"
-	"log"
-    "net"
-	"net/http"
-    "net/rpc"
-    "encoding/base64"
-    "crypto/rand"
-	"os"
-	"sync"
-    "time"
 	"github.com/gorilla/mux"
+	"log"
+	"net"
+	"net/http"
+	"net/rpc"
+	"os"
 	"strconv"
+	"sync"
+	"time"
 )
 
 var (
@@ -62,8 +62,8 @@ func RegisterProcess(ps Job, rcount int) error {
 		log.Println(ps.Path, " does not exist")
 		return err
 	}
-    
-	if err := cp.Initialize(ps,rcount); err != nil {
+
+	if err := cp.Initialize(ps, rcount); err != nil {
 		log.Println("initialize", err)
 		return err
 	}
@@ -72,16 +72,15 @@ func RegisterProcess(ps Job, rcount int) error {
 	cp.Args = ps.Args
 	cp.IsAlive = true
 	//web statistics settings
-    if appConf.Web{
-        cp.EStats = ps.Web
-        cp.EStdErr = ps.Web
-        cp.EStdOut = ps.Web
-    }
+	if appConf.Web {
+		cp.EStats = ps.Web
+		cp.EStdErr = ps.Web
+		cp.EStdOut = ps.Web
+	}
 	//Start logging the process stdout
 	go LogStdOut(cp)
 	//Start logging the process stderr
 	go LogStdErr(cp)
-
 
 	AddProcess(cp)
 	fmt.Println("[*]", cp.Pname, "started successfully.")
@@ -92,16 +91,16 @@ func RegisterProcess(ps Job, rcount int) error {
 	if !cp.KillSwitch {
 		if ps.Restart { //restart process
 			//crash report
-            if time.Since(cp.Timestamp).Seconds() > 10{
-                RemoveProcess(cp)
-                return RegisterProcess(ps, cp.RestartCount+1)
-            }else{
-                log.Println(cp.Pname,"is exiting too quick. Backing off. Start Explicitly")
-                if _, ok := activeProcesses[cp.PID]; ok {
-			         activeProcesses[cp.PID].IsAlive = false
-		        }
-                return nil
-            }
+			if time.Since(cp.Timestamp).Seconds() > 10 {
+				RemoveProcess(cp)
+				return RegisterProcess(ps, cp.RestartCount+1)
+			} else {
+				log.Println(cp.Pname, "is exiting too quick. Backing off. Start Explicitly")
+				if _, ok := activeProcesses[cp.PID]; ok {
+					activeProcesses[cp.PID].IsAlive = false
+				}
+				return nil
+			}
 		}
 		RemoveProcess(cp)
 	}
@@ -120,101 +119,96 @@ func AttachProcess(rw http.ResponseWriter, r *http.Request) {
 }
 
 var (
-	err     error
+	err error
 )
 
-
-func parseCommand() bool{
-    if len(os.Args) > 1{
-        if os.Args[1] == "install"{
-            if err := install(); err != nil{
-                os.Exit(-1)
-            }
-            fmt.Println("[*] Zist has been succesfully installed")
-            return true
-        }
-        if os.Args[1] == "generate"{
-            fmt.Println("[*] Safe Token: ",generateToken())
-            return true
-        }
-    }
-    return false
+func parseCommand() bool {
+	if len(os.Args) > 1 {
+		if os.Args[1] == "install" {
+			if err := install(); err != nil {
+				os.Exit(-1)
+			}
+			fmt.Println("[*] Zist has been succesfully installed")
+			return true
+		}
+		if os.Args[1] == "generate" {
+			fmt.Println("[*] Safe Token: ", generateToken())
+			return true
+		}
+	}
+	return false
 }
 
 //generate securely random URL safe token
-func generateToken() string{
-    b := make([]byte,32)
-    _,err :=  rand.Read(b)
-    if err != nil{
-        return err.Error()
-    }
-    return base64.URLEncoding.EncodeToString(b)
+func generateToken() string {
+	b := make([]byte, 32)
+	_, err := rand.Read(b)
+	if err != nil {
+		return err.Error()
+	}
+	return base64.URLEncoding.EncodeToString(b)
 
 }
 
-func listenRPC() (net.Listener,error){
-    rpc.Register(new(Communicator))
-    rpc.HandleHTTP()
-    return net.Listen("tcp",":"+strconv.Itoa(appConf.RPCPort))
+func listenRPC() (net.Listener, error) {
+	rpc.Register(new(Communicator))
+	rpc.HandleHTTP()
+	return net.Listen("tcp", ":"+strconv.Itoa(appConf.RPCPort))
 }
-
 
 func main() {
-    if parseCommand(){
-        return
-    }
-    f, ferr := os.OpenFile("error.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	if parseCommand() {
+		return
+	}
+	f, ferr := os.OpenFile("error.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if ferr != nil {
-		if os.IsPermission(ferr){
-            fmt.Println("[*]","Can't create log file.Not enough priviledges.")
-            return
-        }
-        fmt.Println(ferr.Error())
-        return
+		if os.IsPermission(ferr) {
+			fmt.Println("[*]", "Can't create log file.Not enough priviledges.")
+			return
+		}
+		fmt.Println(ferr.Error())
+		return
 	}
 	defer f.Close()
-    
+
 	// confPath := flag.String("conf", "", "-conf=/path/to/conffile")
 	keyfile := flag.String("keyfile", "", "-keyfile=path/to/keyfile")
 	certfile := flag.String("certfile", "", "-certfile=path/to/certfile")
 	flag.Parse()
-    
-      if err := BinaryConf(); err != nil{
-        fmt.Println("[*] Fatal:",err.Error())
-        return
-    }
-    
-	if err = ZistConf(); err != nil{
-        fmt.Println("[*] Fatal:",err.Error())
-        return
-    }
-    
-  
-    
-    if err = ReadConfig(); err != nil{
-        log.Println(err.Error())
-        return
-    }
-    log.SetOutput(f)
-    log.Println(1)
+
+	if err := BinaryConf(); err != nil {
+		fmt.Println("[*] Fatal:", err.Error())
+		return
+	}
+
+	if err = ZistConf(); err != nil {
+		fmt.Println("[*] Fatal:", err.Error())
+		return
+	}
+
+	if err = ReadConfig(); err != nil {
+		log.Println(err.Error())
+		return
+	}
+	log.SetOutput(f)
+	log.Println(1)
 	activeProcesses = make(map[int]*ChildProcess)
 
 	for _, job := range jobs {
 		go RegisterProcess(job, 0)
 	}
-    
-    
-    listener,rpcErr := listenRPC()
-    if rpcErr != nil{
-        log.Println(err.Error())
-        return
-    }
-    
-    //Start RPC listener
-    go func(){
-      log.Println(http.Serve(listener,nil).Error())  
-    }()
-    
+
+	listener, rpcErr := listenRPC()
+	if rpcErr != nil {
+		log.Println(err.Error())
+		return
+	}
+
+	//Start RPC listener
+	go func() {
+		log.Println(http.Serve(listener, nil).Error())
+	}()
+
 	router := mux.NewRouter()
 	router.HandleFunc("/{token}", CheckToken(Default))
 	router.HandleFunc("/{token}/{pid}/stats", CheckToken(WithProcess(Stats)))

@@ -91,10 +91,10 @@ func WithProcess(next http.HandlerFunc) http.HandlerFunc {
 func Stats(rw http.ResponseWriter, r *http.Request) {
 	proc := GetVar(r, "proc").(*ChildProcess)
 	defer RemoveVars(r)
-    if !proc.EStats{
-        rw.Write([]byte("Not allowed"))
-        return
-    }
+	if !proc.EStats {
+		rw.Write([]byte("Not allowed"))
+		return
+	}
 	stats, sterr := proc.Stats()
 	if sterr != nil {
 		http.Error(rw, sterr.Error(), http.StatusInternalServerError)
@@ -121,7 +121,7 @@ func Default(rw http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(rw).Encode(procs)
 }
 
-//Kill instructs zist to kill a process by pid 
+//Kill instructs zist to kill a process by pid
 func Kill(rw http.ResponseWriter, r *http.Request) {
 	proc := GetVar(r, "proc").(*ChildProcess)
 	defer RemoveVars(r)
@@ -136,10 +136,10 @@ func Start(rw http.ResponseWriter, r *http.Request) {
 	pid := GetVar(r, "pid").(int)
 	defer RemoveVars(r)
 
-	if err := startProcess(proc,pid,0); err != nil{
-        http.Error(rw, err.Error(), http.StatusNotFound)
-        return
-    }
+	if err := startProcess(proc, pid, 0); err != nil {
+		http.Error(rw, err.Error(), http.StatusNotFound)
+		return
+	}
 
 	log.Println(pid, " restarted with new pid ", proc.PID)
 	rw.Write([]byte(strconv.Itoa(proc.PID)))
@@ -152,16 +152,16 @@ func Restart(rw http.ResponseWriter, r *http.Request) {
 	defer RemoveVars(r)
 
 	proc.Kill()
-    if err := startProcess(proc,pid,proc.RestartCount+1); err != nil{
-        http.Error(rw, err.Error(), http.StatusNotFound)
-        return
-    }
+	if err := startProcess(proc, pid, proc.RestartCount+1); err != nil {
+		http.Error(rw, err.Error(), http.StatusNotFound)
+		return
+	}
 
 	log.Println(pid, " restarted with new pid ", proc.PID)
 	rw.Write([]byte(strconv.Itoa(proc.PID)))
 }
 
-//Detach requests zist to detach a process 
+//Detach requests zist to detach a process
 func Detach(rw http.ResponseWriter, r *http.Request) {
 	proc := GetVar(r, "proc").(*ChildProcess)
 	defer RemoveVars(r)
@@ -176,10 +176,10 @@ func Detach(rw http.ResponseWriter, r *http.Request) {
 func StdOut(rw http.ResponseWriter, r *http.Request) {
 	proc := GetVar(r, "proc").(*ChildProcess)
 	defer RemoveVars(r)
-    if !proc.EStdOut{
-        rw.Write([]byte("Not allowed"))
-        return
-    }
+	if !proc.EStdOut {
+		rw.Write([]byte("Not allowed"))
+		return
+	}
 	json.NewEncoder(rw).Encode(proc.GetOutput())
 }
 
@@ -187,26 +187,26 @@ func StdOut(rw http.ResponseWriter, r *http.Request) {
 func StdErr(rw http.ResponseWriter, r *http.Request) {
 	proc := GetVar(r, "proc").(*ChildProcess)
 	defer RemoveVars(r)
-    if !proc.EStdErr{
-        rw.Write([]byte("Not allowed"))
-        return
-    }
+	if !proc.EStdErr {
+		rw.Write([]byte("Not allowed"))
+		return
+	}
 	json.NewEncoder(rw).Encode(proc.GetErrors())
 }
 
 //startProcess starts the requested child process
-func startProcess(proc *ChildProcess,pid,numrestarts int) error{
-    procstrct := Job{
+func startProcess(proc *ChildProcess, pid, numrestarts int) error {
+	procstrct := Job{
 		Path: proc.PPath,
 	}
-	if err := proc.Initialize(procstrct,numrestarts); err != nil {
+	if err := proc.Initialize(procstrct, numrestarts); err != nil {
 		return err
 	}
-    proc.IsAlive = true
+	proc.IsAlive = true
 	AddProcess(proc)
 
 	cp := new(ChildProcess)
 	cp.PID = pid
 	RemoveProcess(cp)
-    return nil
+	return nil
 }

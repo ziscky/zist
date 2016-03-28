@@ -19,7 +19,6 @@ package main
 
 import (
 	"bufio"
-
 )
 
 //LogStdOut redirects the process stdout to the cp array
@@ -37,4 +36,3 @@ func LogStdErr(cp *ChildProcess) {
 		cp.AppendError(stdErrScanner.Text())
 	}
 }
-
