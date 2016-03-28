@@ -1,6 +1,7 @@
 # **zist**
 [![Build Status](https://travis-ci.org/ziscky/zist.svg?branch=master)](https://travis-ci.org/ziscky/zist)
-https://goreportcard.com/badge/github.com/ziscky/zist
+[![Build Status](https://goreportcard.com/badge/github.com/ziscky/zist)](https://goreportcard.com/report/github.com/ziscky/zist)
+
 
 #Think supervisord plus remote commandeering via rpc
 ------------------------------------------------------------------------
